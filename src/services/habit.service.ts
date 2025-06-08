@@ -3,6 +3,9 @@ import { HabitRepository } from '../repositories/habit.repository';
 import { UserRepository } from '../repositories/user.repository';
 
 export class HabitService {
+    updateHabit(habitId: string, id: string, updatedData: any) {
+        throw new Error('Method not implemented.');
+    }
     private habitRepository = new HabitRepository();
     private userRepository = new UserRepository();
 

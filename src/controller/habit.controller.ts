@@ -39,6 +39,34 @@ class HabitController {
         }
     };
 
+    static updateHabit = async (request: Request, response: Response): Promise<void> => {
+  try {
+    if (!request.user) {
+      response.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const habitId = request.params.id;
+    const updatedData = request.body;
+
+    if (!habitId) {
+      response.status(400).json({ message: 'Invalid habit ID' });
+      return;
+    }
+
+    const updatedHabit = await this.habitService.updateHabit(
+      habitId,
+      request.user.id,
+      updatedData
+    );
+
+    response.json(updatedHabit);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    response.status(400).json({ message: errorMessage });
+  }
+};
+
     static markHabitComplete = async (request: Request, response: Response): Promise<void> => {
         try {
             if (!request.user) {
@@ -67,6 +95,27 @@ class HabitController {
             response.status(400).json({ message: errorMessage });
         }
     };
+    static deleteHabit = async (request: Request, response: Response): Promise<void> => {
+  try {
+    if (!request.user) {
+      response.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const habitId = request.params.id;
+
+    if (!habitId) {
+      response.status(400).json({ message: 'Invalid habit ID' });
+      return;
+    }
+
+    await this.habitService.deleteHabit(habitId, request.user.id);
+    response.status(204).send();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    response.status(400).json({ message: errorMessage });
+  }
+};
 }
 
 export default HabitController;

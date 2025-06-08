@@ -48,6 +48,8 @@ protectedRouter.get('/expenses/:month/:year', asyncHandler(ExpenseController.get
 protectedRouter.post('/habits', asyncHandler(HabitController.addHabit));
 protectedRouter.get('/habits', asyncHandler(HabitController.getHabits));
 protectedRouter.patch('/habits/:id', asyncHandler(HabitController.markHabitComplete));
+protectedRouter.put('/habits/:id', asyncHandler(HabitController.updateHabit));
+protectedRouter.delete('/habits/:id', asyncHandler(HabitController.deleteHabit));
 
 // Emergency
 protectedRouter.post('/emergency', asyncHandler(EmergencyController.addToEmergencyFund));
