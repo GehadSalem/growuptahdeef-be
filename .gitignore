@@ -1,0 +1,5 @@
+node_modules
+# Keep environment variables out of version control
+.env
+growup-tahdeef-436e0-firebase-adminsdk-fbsvc-b066554920.json
+dist

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES5",                          // Output ES5
+    "module": "CommonJS",                    // Still CommonJS for Node.js
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "allowJs": true,
+  "resolveJsonModule": true,
+  "noEmitOnError": false,
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist", "test"]
+}
