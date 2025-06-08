@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-// allowedOrigins.push('http://31.97.55.57');
+allowedOrigins.push('http://31.97.55.57');
 // CORS configuration
 const corsOptions = {
   origin: allowedOrigins,
@@ -19,7 +19,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
-
+app.options('*', cors(corsOptions)); 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
