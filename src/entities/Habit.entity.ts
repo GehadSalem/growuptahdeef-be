@@ -17,18 +17,17 @@ export class Habit {
   @Column()
   name!: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['daily', 'weekly', 'monthly'],
-    default: 'daily',
-  })
-  frequency!: string;
+  // Change this to match frontend structure
+  @Column({ type: 'jsonb' })
+  frequency!: {
+    type: 'daily' | 'weekly' | 'monthly';
+    time?: string;
+    days?: number[];
+    dayOfMonth?: number;
+  };
 
   @Column({ default: false })
   completed!: boolean;
-
-  @Column({ type: 'time', nullable: true })
-  reminderTime!: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
