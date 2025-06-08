@@ -1,4 +1,4 @@
-// src/entities/Habit.ts
+// src/entities/Habit.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -17,17 +17,18 @@ export class Habit {
   @Column()
   name!: string;
 
-  // Change this to match frontend structure
-  @Column({ type: 'jsonb' })
-  frequency!: {
-    type: 'daily' | 'weekly' | 'monthly';
-    time?: string;
-    days?: number[];
-    dayOfMonth?: number;
-  };
+  @Column({
+    type: 'enum',
+    enum: ['daily', 'weekly', 'monthly'],
+    default: 'daily',
+  })
+  frequency!: string; // Keep as string enum to match your DB
 
   @Column({ default: false })
   completed!: boolean;
+
+  @Column({ type: 'time', nullable: true })
+  reminderTime!: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
