@@ -11,11 +11,18 @@ export class HabitRepository {
 
     // Basic CRUD operations
     async create(habitData: Partial<Habit>): Promise<Habit> {
-        const habit = this.repository.create(habitData);
+        // Ensure frequency has proper structure
+        const completeHabitData = {
+            ...habitData,
+            frequency: this.normalizeFrequency(habitData.frequency)
+        };
+        const habit = this.repository.create(completeHabitData);
         return this.repository.save(habit);
     }
 
     async save(habit: Habit): Promise<Habit> {
+        // Normalize frequency before saving
+        habit.frequency = this.normalizeFrequency(habit.frequency);
         return this.repository.save(habit);
     }
 
@@ -43,8 +50,13 @@ export class HabitRepository {
         });
     }
 
-    // Update operations - FIXED VERSION
+    // Update operations
     async update(id: string, updateData: Partial<Habit>): Promise<Habit> {
+        // Normalize frequency if present in update
+        if (updateData.frequency) {
+            updateData.frequency = this.normalizeFrequency(updateData.frequency);
+        }
+        
         await this.repository.update(id, updateData);
         const updated = await this.findById(id);
         if (!updated) throw new Error('Habit not found after update');
@@ -52,9 +64,13 @@ export class HabitRepository {
     }
 
     async updateByCriteria(
-        criteria: FindOptionsWhere<Habit>, // Changed from FindManyOptions
+        criteria: FindOptionsWhere<Habit>,
         updateData: Partial<Habit>
     ): Promise<UpdateResult> {
+        // Normalize frequency if present in update
+        if (updateData.frequency) {
+            updateData.frequency = this.normalizeFrequency(updateData.frequency);
+        }
         return this.repository.update(criteria, updateData);
     }
 
@@ -69,8 +85,8 @@ export class HabitRepository {
     async resetDailyHabits(userId: string): Promise<void> {
         await this.updateByCriteria(
             { 
-                user: { id: userId }, // Simplified where clause
-                frequency: 'daily' 
+                user: { id: userId },
+                frequency: { type: 'daily' } as any // Type workaround for JSONB query
             },
             { completed: false }
         );
@@ -79,5 +95,35 @@ export class HabitRepository {
     // Delete operation
     async delete(id: string): Promise<void> {
         await this.repository.delete(id);
+    }
+
+    // Helper method to ensure frequency has proper structure
+    private normalizeFrequency(frequency: any): Habit['frequency'] {
+        if (!frequency) {
+            return {
+                type: 'daily',
+                time: '09:00'
+            };
+        }
+
+        // If coming from old DB structure (string)
+        if (typeof frequency === 'string') {
+            return {
+                type: frequency as 'daily' | 'weekly' | 'monthly',
+                time: '09:00'
+            };
+        }
+
+        // Ensure complete structure
+        return {
+            type: frequency.type || 'daily',
+            time: frequency.time || '09:00',
+            ...(frequency.type === 'weekly' && { 
+                days: frequency.days || [0] // Default to Sunday
+            }),
+            ...(frequency.type === 'monthly' && {
+                dayOfMonth: frequency.dayOfMonth || 1 // Default to 1st of month
+            })
+        };
     }
 }
