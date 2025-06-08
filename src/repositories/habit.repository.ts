@@ -3,6 +3,9 @@ import { AppDataSource } from '../../src/dbConfig/data-source';
 import { Habit } from '../entities/Habit.entity';
 
 export class HabitRepository {
+    resetDailyHabits(userId: string) {
+        throw new Error('Method not implemented.');
+    }
     private repository: Repository<Habit>;
 
     constructor() {
@@ -43,7 +46,7 @@ export class HabitRepository {
         });
     }
 
-    // Update operations - FIXED VERSION
+    // Update operations
     async update(id: string, updateData: Partial<Habit>): Promise<Habit> {
         await this.repository.update(id, updateData);
         const updated = await this.findById(id);
@@ -52,32 +55,57 @@ export class HabitRepository {
     }
 
     async updateByCriteria(
-        criteria: FindOptionsWhere<Habit>, // Changed from FindManyOptions
+        criteria: FindOptionsWhere<Habit>,
         updateData: Partial<Habit>
     ): Promise<UpdateResult> {
         return this.repository.update(criteria, updateData);
     }
 
     // Business logic methods
-    async markComplete(id: string): Promise<Habit> {
-        return this.update(id, { 
-            completed: true,
-            lastCompletedAt: new Date()
-        });
-    }
+   async markComplete(id: string, completed: boolean): Promise<Habit> {
+    await this.repository.update(id, { 
+        completed,
+        lastCompletedAt: completed ? new Date() : null
+    });
+    const updated = await this.findById(id);
+    if (!updated) throw new Error('Habit not found after update');
+    return updated;
+}
 
-    async resetDailyHabits(userId: string): Promise<void> {
-        await this.updateByCriteria(
-            { 
-                user: { id: userId }, // Simplified where clause
-                frequency: 'daily' 
-            },
-            { completed: false }
-        );
+    async resetHabitsByFrequency(
+    userId: string, 
+    frequencyType: 'daily' | 'weekly' | 'monthly' // تغيير هنا
+): Promise<void> {
+    await this.repository
+        .createQueryBuilder()
+        .update(Habit)
+        .set({ completed: false })
+        .where('user_id = :userId', { userId })
+        .andWhere('frequency->>\'type\' = :frequencyType', { frequencyType })
+        .execute();
+}
+
+    // New method to find habits by frequency type
+    async findByFrequencyType(userId: string, frequencyType: string): Promise<Habit[]> {
+        return this.repository
+            .createQueryBuilder('habit')
+            .where('habit.user_id = :userId', { userId })
+            .andWhere('habit.frequency->>\'type\' = :frequencyType', { frequencyType })
+            .getMany();
     }
 
     // Delete operation
     async delete(id: string): Promise<void> {
         await this.repository.delete(id);
+    }
+
+    // New method to update frequency object
+    async updateFrequency(id: string, frequency: {
+        type: 'daily' | 'weekly' | 'monthly';
+        time?: string;
+        days?: number[];
+        dayOfMonth?: number;
+    }): Promise<Habit> {
+        return this.update(id, { frequency });
     }
 }

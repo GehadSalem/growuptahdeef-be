@@ -3,9 +3,6 @@ import { HabitRepository } from '../repositories/habit.repository';
 import { UserRepository } from '../repositories/user.repository';
 
 export class HabitService {
-    updateHabit(habitId: string, id: string, updatedData: any) {
-        throw new Error('Method not implemented.');
-    }
     private habitRepository = new HabitRepository();
     private userRepository = new UserRepository();
 
@@ -36,6 +33,17 @@ export class HabitService {
             throw new Error('حدث خطأ أثناء استرجاع العادات');
         }
     }
+    async getHabitsByFrequency(
+    userId: string,
+    frequencyType: 'daily' | 'weekly' | 'monthly'
+): Promise<Habit[]> {
+    try {
+        return await this.habitRepository.findByFrequencyType(userId, frequencyType);
+    } catch (error) {
+        console.error('Error fetching habits by frequency:', error);
+        throw new Error('حدث خطأ أثناء استرجاع العادات حسب التكرار');
+    }
+}
 
     async markHabitComplete(habitId: string, userId: string): Promise<Habit> {
         try {
@@ -47,14 +55,53 @@ export class HabitService {
                 throw new Error('العادة غير موجودة');
             }
 
-            if (habit.completed) {
-                throw new Error('العادة مكتملة بالفعل');
+            return await this.habitRepository.markComplete(habitId, !habit.completed);
+        } catch (error) {
+            console.error('Error toggling habit completion:', error);
+            throw error instanceof Error ? error : new Error('حدث خطأ أثناء تحديث العادة');
+        }
+    }
+
+    async updateHabit(
+        habitId: string,
+        userId: string,
+        updateData: {
+            title?: string;
+            name?: string;
+            category?: string;
+            frequency?: {
+                type: 'daily' | 'weekly' | 'monthly';
+                time?: string;
+                days?: number[];
+                dayOfMonth?: number;
+            };
+        }
+    ): Promise<Habit> {
+        try {
+            const habit = await this.habitRepository.findOne({
+                where: { id: habitId, user: { id: userId } }
+            });
+
+            if (!habit) {
+                throw new Error('العادة غير موجودة');
             }
 
-            return await this.habitRepository.markComplete(habitId);
+            if (updateData.name) habit.name = updateData.name; // إذا كانت الواجهة ترسل name بدلاً من title
+            if (updateData.category) habit.category = updateData.category;
+
+            if (updateData.frequency) {
+                habit.frequency = {
+                    type: updateData.frequency.type,
+                    time: updateData.frequency.time || habit.frequency?.time,
+                    days: updateData.frequency.days || habit.frequency?.days,
+                    dayOfMonth: updateData.frequency.dayOfMonth || habit.frequency?.dayOfMonth
+                };
+            }
+
+            return await this.habitRepository.save(habit);
         } catch (error) {
-            console.error('Error completing habit:', error);
-            throw error instanceof Error ? error : new Error('حدث خطأ أثناء تحديث العادة');
+            console.error('Error updating habit:', error);
+            throw new Error('حدث خطأ أثناء تحديث العادة');
         }
     }
 
@@ -83,4 +130,16 @@ export class HabitService {
             throw new Error('حدث خطأ أثناء حذف العادة');
         }
     }
+
+    async resetHabitsByFrequency(
+    userId: string, 
+    frequencyType: 'daily' | 'weekly' | 'monthly' // تغيير هنا
+): Promise<void> {
+    try {
+        await this.habitRepository.resetHabitsByFrequency(userId, frequencyType);
+    } catch (error) {
+        console.error('Error resetting habits by frequency:', error);
+        throw new Error('حدث خطأ أثناء إعادة تعيين العادات حسب التكرار');
+    }
+}
 }

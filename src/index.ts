@@ -49,7 +49,7 @@ AppDataSource.initialize()
     // Error handler
     app.use(globalErrorHandling);
 
-    const server = app.listen(port, '0.0.0.0', () => {
+    const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
     server.on('error', (error) => {
