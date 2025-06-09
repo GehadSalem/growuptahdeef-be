@@ -11,25 +11,25 @@ dotenv.config();
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+// const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
-const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
+// const corsOptions = {
+//   origin: function (origin: string | undefined, callback: Function) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true,
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204
+// };
+app.use(cors());
 
-
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 // // allowedOrigins.push('http://31.97.55.57');
