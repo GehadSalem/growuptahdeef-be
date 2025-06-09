@@ -12,16 +12,50 @@ const app = express();
 const port = Number(process.env.PORT) || 3000;
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-// allowedOrigins.push('http://31.97.55.57');
-// CORS configuration
+
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function (origin: string | undefined, callback: Function) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
+
 app.use(cors(corsOptions));
+
+// const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+// // allowedOrigins.push('http://31.97.55.57');
+// // CORS configuration
+// import { CorsOptions } from 'cors';
+
+// const corsOptions: CorsOptions = {
+//   origin: (origin: string | undefined, callback) => {
+//     console.log('Incoming origin:', origin);
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       console.log('Blocked by CORS:', origin);
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,
+// };
+
+// app.options('*', cors(corsOptions)); 
+// app.use(cors());
+// app.use(cors())
+//   app.use(cors({
+//     origin: "https://growupe.com", // Replace with your frontend domain
+//     credentials: true // Allow cookies
+//   }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
