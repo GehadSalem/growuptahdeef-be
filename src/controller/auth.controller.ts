@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
+import tokenBlacklist from '../utils/tokenBlacklist';
 
 class AuthController {
     private static authService = new AuthService();
@@ -26,6 +27,26 @@ class AuthController {
             response.status(401).json({ message: errorMessage });
         }
     };
+
+static logout = (req: Request, res: Response): void => {
+    const { authorization } = req.headers;
+
+    if (!authorization) {
+        res.status(400).json({ message: 'No authorization header' });
+        return;
+    }
+
+    const parts = authorization.split('__');
+    const token = parts[1];
+
+    if (!token) {
+        res.status(400).json({ message: 'Invalid token format' });
+        return;
+    }
+
+    tokenBlacklist.add(token); 
+    res.status(200).json({ message: 'Logout successful' });
+};
 
     static googleAuth = async (request: Request, response: Response): Promise<void> => {
         try {

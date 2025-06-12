@@ -16,6 +16,7 @@ import { authenticate } from '../middlewares/auth.middleware';
 import { asyncHandler } from '../middlewares/error.middleware';
 import { getCurrency } from '../middlewares/getCurrency';
 import protectedRouter from '../utils/protectedRouter';
+// import logout from '../controller/auth.controller';
 
 const publicRouter = Router();
 
@@ -29,7 +30,10 @@ publicRouter.get('/currency', getCurrency, (req: Request, res: Response) => {
 // Authentication
 publicRouter.post('/register', asyncHandler(AuthController.register));
 publicRouter.post('/login', asyncHandler(AuthController.login));
-publicRouter.post('/google', asyncHandler(AuthController.googleAuth)); // Google auth route
+publicRouter.post('/google', asyncHandler(AuthController.googleAuth)); 
+publicRouter.post('/logout', asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  AuthController.logout(req, res);
+}));
 
 /* ---------------------- Protected Routes ---------------------- */
 

@@ -63,7 +63,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  // ✅ الدور (admin أو user)
+  //  الدور (admin أو user)
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role!: UserRole;
 
