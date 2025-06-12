@@ -37,7 +37,7 @@ publicRouter.post('/google', asyncHandler(AuthController.googleAuth)); // Google
 protectedRouter.use(asyncHandler(authenticate));
 
 //users
-protectedRouter.get('/users', asyncHandler(UserController.getAllUsers));
+protectedRouter.get('/user', asyncHandler(UserController.getAllUsers));
 
 // Expenses
 protectedRouter.post('/expenses', asyncHandler(ExpenseController.addExpense));
@@ -54,6 +54,7 @@ protectedRouter.delete('/habits/:id', asyncHandler(HabitController.deleteHabit))
 // Emergency
 protectedRouter.post('/emergency', asyncHandler(EmergencyController.addToEmergencyFund));
 protectedRouter.get('/emergency', asyncHandler(EmergencyController.getEmergencyFunds));
+protectedRouter.post('/emergency/withdraw', EmergencyController.withdrawFromEmergencyFund);
 
 // Notifications
 protectedRouter.get('/notification', asyncHandler(NotificationController.testNotification));

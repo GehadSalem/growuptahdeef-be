@@ -79,8 +79,8 @@ export class User {
   @OneToMany(() => SavingsGoal, (savingsGoal) => savingsGoal.user)
   savingsGoals!: SavingsGoal[];
 
-  @OneToMany(() => EmergencyFund, (emergency) => emergency.user)
-  emergencyFunds!: EmergencyFund[];
+  @OneToMany(() => EmergencyFund, fund => fund.user)
+emergencyFunds!: EmergencyFund[];
 
   @OneToMany(() => DailyTask, (task) => task.user)
   dailyTasks!: DailyTask[];

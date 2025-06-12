@@ -1,20 +1,31 @@
+// src/entities/EmergencyFund.entity.ts
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User.entity';
 
+// تعريف النوع (type) باستخدام enum
+export enum EmergencyFundType {
+  DEPOSIT = 'deposit',
+  WITHDRAWAL = 'withdrawal',
+}
+
 @Entity()
 export class EmergencyFund {
-    @PrimaryGeneratedColumn('uuid')
-    id!: string; // Changed to definite assignment assertion
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-    @Column({ type: 'decimal', precision: 10, scale: 2 }) // Better for monetary values
-    amount!: number; // Must be provided
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  amount!: number;
 
-    @Column({ type: 'date' })
-    date!: Date; // Must be provided
+  @Column({ type: 'date' })
+  date!: Date;
 
-    @Column()
-    description!: string; // Must be provided
+  @Column()
+  description!: string;
 
-    @ManyToOne(() => User, user => user.emergencyFunds)
-    user!: User; // Must be provided
+   @Column({ type: 'enum', enum: ['deposit', 'withdrawal'] })
+  type: EmergencyFundType;
+
+  @ManyToOne(() => User, user => user.emergencyFunds)
+  user!: User;
 }

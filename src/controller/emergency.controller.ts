@@ -31,19 +31,34 @@ class EmergencyController {
     };
 
     static getEmergencyFunds = async (request: Request, response: Response): Promise<void> => {
-        try {
-            if (!request.user) {
-                response.status(401).json({ message: 'Unauthorized' });
-                return;
-            }
+  try {
+    if (!request.user) {
+      response.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
 
-            const funds = await this.emergencyService.getUserFunds(request.user?.id);
-            response.json(funds);
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-            response.status(500).json({ message: errorMessage });
-        }
-    };
+    const funds = await this.emergencyService.getUserFunds(request.user.id);
+
+    // حساب الرصيد الكلي
+    const totalAmount = funds.reduce((sum, tx) => {
+      // Replace 'transactionType' with the correct property, e.g., 'type'
+      return tx.type === "deposit"
+        ? sum + Number(tx.amount || 0)
+        : sum - Number(tx.amount || 0);
+    }, 0);
+
+    // ✅ الآن يرجع البيانات بالشكل المطلوب
+    response.json({
+      transactions: funds,
+      totalAmount,
+    });
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    response.status(500).json({ message: errorMessage });
+  }
+};
+
 
     static calculateEmergencyFund = async (request: Request, response: Response): Promise<void> => {
         try {
@@ -61,6 +76,40 @@ class EmergencyController {
             response.status(400).json({ message: errorMessage });
         }
     };
+
+    static withdrawFromEmergencyFund = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const amount = Number(req.body.amount);
+    const description = req.body.description;
+
+    if (isNaN(amount) || amount <= 0) {
+      res.status(400).json({ message: 'المبلغ غير صالح' });
+      return;
+    }
+
+    const result = await this.emergencyService.withdrawFromFund(
+      req.user.id,
+      amount,
+      description
+    );
+
+    res.status(200).json({
+      message: 'تم السحب بنجاح',
+      ...result,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({ message: errorMessage });
+  }
+};
+
+
+
 }
 
 export default EmergencyController;
