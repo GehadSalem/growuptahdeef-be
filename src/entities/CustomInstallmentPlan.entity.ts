@@ -8,20 +8,19 @@ export class CustomInstallmentPlan {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => User, user => user.installmentPlans)
-  user!: User;
-
+  @ManyToOne(() => User, user => user.installmentPlans, { onDelete: 'CASCADE' })
+user!: User;
   @Column()
-  productName!: string;
+  name!: string;
 
   @Column('decimal', { precision: 12, scale: 2 })
-  totalCost!: number;
+  totalAmount!: number;
 
   @Column('decimal', { precision: 12, scale: 2, default: 0 })
   downPayment!: number;
 
   @Column('int')
-  monthsCount!: number;
+  monthlyAmount!: number;
 
   @Column('decimal', { precision: 12, scale: 2 })
   monthlyInstallment!: number;
@@ -33,7 +32,7 @@ export class CustomInstallmentPlan {
   startDate!: Date;
 
   @Column({ type: 'date', nullable: true })
-  endDate!: Date | null;
+  dueDate!: Date | null;
 
   @Column({
     type: 'enum',

@@ -12,27 +12,27 @@ export class CustomInstallmentPlanController {
 
   static addPlan = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { productName, totalCost, downPayment, monthsCount, interestRate, linkedGoalId } = req.body;
+      const { name, totalAmount, downPayment, monthlyAmount, dueDate , interestRate, linkedGoalId } = req.body;
 
       // Basic validation
-      if (!productName || !totalCost || !monthsCount) {
+      if (!name || !totalAmount || !monthlyAmount || !dueDate) {
         res.status(400).json({ message: 'Missing required fields' });
         return;
       }
 
       // Create new plan
       const plan = new CustomInstallmentPlan();
-      plan.productName = productName;
-      plan.totalCost = totalCost;
+      plan.name = name;
+      plan.totalAmount = totalAmount;
       plan.downPayment = downPayment || 0;
-      plan.monthsCount = monthsCount;
+      plan.monthlyAmount = monthlyAmount;
       plan.interestRate = interestRate || 0;
       
       // Calculate monthly installment
       plan.monthlyInstallment = this.calculateMonthlyPayment(
-        totalCost - (downPayment || 0),
+        totalAmount - (downPayment || 0),
         interestRate || 0,
-        monthsCount
+        monthlyAmount
       );
 
       // Link to goal if provided

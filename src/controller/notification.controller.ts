@@ -6,6 +6,32 @@ import { NotificationService } from '../services/notification.service';
 class NotificationController {
   private static notificationService = new NotificationService();
 
+  static createNotification = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title, message, type, scheduledTime, relatedEntityId } = req.body;
+    const user = req.user as User;
+
+    if (!title || !message) {
+      res.status(400).json({ message: "العنوان والرسالة مطلوبان" });
+      return;
+    }
+
+    await this.notificationService.createNotification(user.id, {
+      title,
+      message,
+      type,
+      scheduledTime,
+      relatedEntityId
+    });
+
+    res.json({ message: "تم إنشاء الإشعار بنجاح" });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    res.status(400).json({ message });
+  }
+};
+
+
   static updateToken = async (req: Request, res: Response): Promise<void> => {
     try {
       const { token } = req.body;

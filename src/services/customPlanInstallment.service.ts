@@ -55,15 +55,15 @@ export class CustomInstallmentPlanService {
     };
 
     // Recalculate monthly installment if totalCost or monthsCount changes
-    if (updateData.totalCost !== undefined || updateData.monthsCount !== undefined) {
-      const newTotalCost = updateData.totalCost ?? existingPlan.totalCost;
-      const newMonthsCount = updateData.monthsCount ?? existingPlan.monthsCount;
+    if (updateData.totalAmount !== undefined || updateData.monthlyAmount !== undefined) {
+      const newTotalAmount = updateData.totalAmount ?? existingPlan.totalAmount;
+      const newMonthlyAmount = updateData.monthlyAmount ?? existingPlan.monthlyAmount;
       
-      if (newTotalCost <= 0 || newMonthsCount <= 0) {
-        throw new Error('totalCost and monthsCount must be positive numbers');
+      if (newTotalAmount <= 0 || newMonthlyAmount <= 0) {
+        throw new Error('totalAmount and monthsCount must be positive numbers');
       }
 
-      updatedPlan.monthlyInstallment = newTotalCost / newMonthsCount;
+      updatedPlan.monthlyInstallment = newTotalAmount / newMonthlyAmount;
     }
 
     return await this.repository.update(id, updatedPlan, user);

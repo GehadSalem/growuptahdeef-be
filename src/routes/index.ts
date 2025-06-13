@@ -41,7 +41,7 @@ publicRouter.post('/logout', asyncHandler(async (req: Request, res: Response, ne
 protectedRouter.use(asyncHandler(authenticate));
 
 //users
-protectedRouter.get('/user', asyncHandler(UserController.getAllUsers));
+protectedRouter.get('/user', asyncHandler(UserController.getUserById));
 
 // Expenses
 protectedRouter.post('/expenses', asyncHandler(ExpenseController.addExpense));
@@ -62,6 +62,7 @@ protectedRouter.post('/emergency/withdraw', EmergencyController.withdrawFromEmer
 
 // Notifications
 protectedRouter.get('/notification', asyncHandler(NotificationController.testNotification));
+protectedRouter.post('/notification', asyncHandler(NotificationController.createNotification));
 protectedRouter.patch('/notification/:id', asyncHandler(NotificationController.markNotificationRead));
 protectedRouter.delete('/notification/:id', asyncHandler(NotificationController.testNotification)); 
 
@@ -82,12 +83,12 @@ protectedRouter.delete('/savingsGoals/:id', asyncHandler(SavingsGoalController.d
 protectedRouter.post('/savingsGoals/:id', asyncHandler(SavingsGoalController.addToSavingsGoal));
 
 // Major Goals
-protectedRouter.post('/majorGoals', asyncHandler(MajorGoalController.createMajorGoal));
-protectedRouter.get('/majorGoals', asyncHandler(MajorGoalController.getUserMajorGoals));
-protectedRouter.get('/majorGoals/:id', asyncHandler(MajorGoalController.getMajorGoalById));
-protectedRouter.put('/majorGoals/:id', asyncHandler(MajorGoalController.updateMajorGoal));
-protectedRouter.delete('/majorGoals/:id', asyncHandler(MajorGoalController.deleteMajorGoal));
-protectedRouter.patch('/majorGoals/:id', asyncHandler(MajorGoalController.updateProgress)); // بدون slash زائدة
+protectedRouter.post('/majorgoals', asyncHandler(MajorGoalController.createMajorGoal));
+protectedRouter.get('/majorgoals', asyncHandler(MajorGoalController.getUserMajorGoals));
+protectedRouter.get('/majorgoals/:id', asyncHandler(MajorGoalController.getMajorGoalById));
+protectedRouter.put('/majorgoals/:id', asyncHandler(MajorGoalController.updateMajorGoal));
+protectedRouter.delete('/majorgoals/:id', asyncHandler(MajorGoalController.deleteMajorGoal));
+// protectedRouter.patch('/majorgoals/:id', asyncHandler(MajorGoalController.updateProgress)); // بدون slash زائدة
 
 // Incomes
 protectedRouter.post('/incomes', asyncHandler(IncomeController.addIncome));
