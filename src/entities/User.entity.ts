@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { randomBytes } from 'crypto';
+
 import { Expense } from './Expense.entity';
 import { Habit } from './Habit.entity';
 import { EmergencyFund } from './EmergencyFund.entity';
@@ -16,6 +17,8 @@ import { DailyTask } from './DailyTask.entity';
 import { SavingsGoal } from './SavingsGoal.entity';
 import { Notification } from './Notification.entity';
 import { CustomInstallmentPlan } from './CustomInstallmentPlan.entity';
+import { Referral } from '../entities/Referral';
+import { FinancialPlan } from '../entities/FinancialPlan';
 
 export enum UserRole {
   USER = 'user',
@@ -46,13 +49,16 @@ export class User {
   firebaseUid?: string;
 
   @Column({ default: 'email' })
-  authProvider: 'email' | 'google';
+  authProvider!: 'email' | 'google';
 
   @Column({ nullable: false })
   referralCode!: string;
 
   @Column({ nullable: true })
   referredBy?: string;
+
+  @Column({ default: false })
+  subscribed!: boolean;
 
   @Column({ default: true })
   isActive!: boolean;
@@ -63,7 +69,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  //  الدور (admin أو user)
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role!: UserRole;
 
@@ -90,7 +95,12 @@ export class User {
 
   @OneToMany(() => CustomInstallmentPlan, (plan) => plan.user)
   installmentPlans!: CustomInstallmentPlan[];
-    referrals: any;
+
+  @OneToMany(() => Referral, (referral) => referral.referrer)
+  referrals!: Referral[];
+
+  @OneToMany(() => FinancialPlan, (plan) => plan.user)
+  financialPlans!: FinancialPlan[];
 
   @BeforeInsert()
   generateReferralCode() {

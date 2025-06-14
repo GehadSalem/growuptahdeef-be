@@ -19,9 +19,9 @@ import { authenticate } from '../middlewares/auth.middleware';
 import { asyncHandler } from '../middlewares/error.middleware';
 import { getCurrency } from '../middlewares/getCurrency';
 import protectedRouter from '../utils/protectedRouter';
+import * as Controller from "../controller/financialPlan.controller";
 
 import * as AdminController from "../controller/admin.controller";
-import { isAdmin } from "../middlewares/isAdmin";
 const publicRouter = Router();
 
 /* ---------------------- Public Routes ---------------------- */
@@ -55,6 +55,10 @@ publicRouter.get("/stats", asyncHandler(AdminController.getDashboardStats));
 // Users
 protectedRouter.get('/users', asyncHandler(UserController.getAllUsers));
 
+// financialPlan
+protectedRouter.post("/", Controller.createOrUpdatePlan);
+protectedRouter.post("/expense", Controller.addExpense);
+protectedRouter.get("/", Controller.getPlan);
 // Expenses
 protectedRouter.post('/expenses', asyncHandler(ExpenseController.addExpense));
 protectedRouter.get('/expenses', asyncHandler(ExpenseController.getExpenses));

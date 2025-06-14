@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './User.entity';
+import { FinancialPlan } from './FinancialPlan';
 
 @Entity()
 export class Expense {
@@ -17,6 +18,10 @@ export class Expense {
 
     @Column({ type: 'date' })
     date!: Date;
+
+    @ManyToOne(() => FinancialPlan, (plan) => plan.expenses, { onDelete: "CASCADE" })
+    plan: FinancialPlan;
+
 
     @ManyToOne(() => User, user => user.expenses)
     user!: User;
