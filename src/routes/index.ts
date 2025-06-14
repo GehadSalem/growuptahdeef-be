@@ -11,13 +11,17 @@ import NotificationController from '../controller/notification.controller';
 import { getReferrals } from '../controller/referral.controller';
 import SavingsGoalController from '../controller/savingsGoal.controller';
 import UserController from '../controller/user.controller';
+import {DashboardStatsController} from '../controller/statsController';
+import {BadHabitsController} from '../controller/badHabitsController';
+
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../middlewares/auth.middleware';
 import { asyncHandler } from '../middlewares/error.middleware';
 import { getCurrency } from '../middlewares/getCurrency';
 import protectedRouter from '../utils/protectedRouter';
-// import logout from '../controller/auth.controller';
 
+import * as AdminController from "../controller/admin.controller";
+import { isAdmin } from "../middlewares/isAdmin";
 const publicRouter = Router();
 
 /* ---------------------- Public Routes ---------------------- */
@@ -40,7 +44,15 @@ publicRouter.post('/logout', asyncHandler(async (req: Request, res: Response, ne
 // All routes below this require authentication middleware
 protectedRouter.use(asyncHandler(authenticate));
 
-//users
+publicRouter.use(asyncHandler(authenticate)); 
+
+// Admin routes
+publicRouter.get("/users", asyncHandler(AdminController.getAllUsers));
+publicRouter.delete("/users/:id",  AdminController.deleteUser);
+publicRouter.patch("/users/:id/role",  AdminController.updateUserRole);
+publicRouter.get("/stats", asyncHandler(AdminController.getDashboardStats));
+
+// Users
 protectedRouter.get('/users', asyncHandler(UserController.getAllUsers));
 
 // Expenses
@@ -86,7 +98,7 @@ protectedRouter.get('/majorGoals', asyncHandler(MajorGoalController.getUserMajor
 protectedRouter.get('/majorGoals/:id', asyncHandler(MajorGoalController.getMajorGoalById));
 protectedRouter.put('/majorGoals/:id', asyncHandler(MajorGoalController.updateMajorGoal));
 protectedRouter.delete('/majorGoals/:id', asyncHandler(MajorGoalController.deleteMajorGoal));
-protectedRouter.patch('/majorGoals/:id', asyncHandler(MajorGoalController.updateProgress)); // بدون slash زائدة
+protectedRouter.patch('/majorGoals/:id', asyncHandler(MajorGoalController.updateProgress));
 
 // Incomes
 protectedRouter.post('/incomes', asyncHandler(IncomeController.addIncome));
@@ -111,7 +123,19 @@ protectedRouter.get('/custom-installment-plans/:id', asyncHandler(CustomInstallm
 protectedRouter.put('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.updatePlan));
 protectedRouter.delete('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.deletePlan));
 
-// Referral system (view users referred by the logged-in user)
+// Referral system
 protectedRouter.get('/referrals', asyncHandler(getReferrals));
+
+/* ---------------------- Dashboard Stats ---------------------- */
+protectedRouter.get('/stats/dashboard', asyncHandler(DashboardStatsController.getDashboardStats));
+protectedRouter.get('/stats/weekly', asyncHandler(DashboardStatsController.getWeeklyStats));
+protectedRouter.get('/stats/monthly', asyncHandler(DashboardStatsController.getMonthlyStats));
+
+/* ---------------------- Bad Habits ---------------------- */
+protectedRouter.get('/bad-habits', asyncHandler(BadHabitsController.getAllBadHabits));
+protectedRouter.post('/bad-habits', asyncHandler(BadHabitsController.createBadHabit));
+protectedRouter.put('/bad-habits/:id', asyncHandler(BadHabitsController.updateBadHabit));
+protectedRouter.delete('/bad-habits/:id', asyncHandler(BadHabitsController.deleteBadHabit));
+protectedRouter.post('/bad-habits/:id/occurrence', asyncHandler(BadHabitsController.recordOccurrence));
 
 export { publicRouter, protectedRouter };

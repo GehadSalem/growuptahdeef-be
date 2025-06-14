@@ -90,6 +90,7 @@ export class User {
 
   @OneToMany(() => CustomInstallmentPlan, (plan) => plan.user)
   installmentPlans!: CustomInstallmentPlan[];
+    referrals: any;
 
   @BeforeInsert()
   generateReferralCode() {

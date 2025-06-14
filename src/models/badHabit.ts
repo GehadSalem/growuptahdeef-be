@@ -21,6 +21,9 @@ interface CreateBadHabitInput {
 }
 
 class BadHabit {
+  static findAllByUserId(id: never) {
+    throw new Error('Method not implemented.');
+  }
   static async find(userId: number): Promise<BadHabitWithOccurrences[]> {
 const connection = AppDataSource.manager;
     try {
