@@ -1,4 +1,6 @@
-import { AppDataSource } from '../../src/dbConfig/data-source';
+import { AppDataSource } from '../dbConfig/data-source';
+import { HabitOccurrence } from '../entities/BadHabit.entity';
+import { BadHabit } from '../entities/BadHabit.entity';
 
 interface DashboardStats {
   habitsTracked: number;
@@ -9,7 +11,7 @@ interface DashboardStats {
 
 interface WeeklyProgress {
   weekStart: Date;
-  habitsTracked: number[];
+  habitsTracked: number[]; // optional placeholder
   occurrences: number[];
 }
 
@@ -22,98 +24,75 @@ interface MonthlyReport {
 
 class Stats {
   static async getDashboardStats(userId: number): Promise<DashboardStats> {
-const connection = AppDataSource.manager;
-    try {
-      // Example queries - adjust based on your actual schema
-      const [habitsTracked] = await connection.query(
-        'SELECT COUNT(*) as count FROM user_habits WHERE user_id = ?',
-        [userId]
-      );
-      
-      const [habitsImproved] = await connection.query(
-        `SELECT COUNT(*) as count FROM user_habits 
-         WHERE user_id = ? AND improvement_percentage > 0`,
-        [userId]
-      );
-      
-      const [streak] = await connection.query(
-        `SELECT MAX(streak) as currentStreak FROM habit_streaks 
-         WHERE user_id = ?`,
-        [userId]
-      );
-      
-      return {
-        habitsTracked: habitsTracked[0].count,
-        habitsImproved: habitsImproved[0].count,
-        currentStreak: streak[0].currentStreak || 0,
-        weeklyProgress: 75 // This would come from a more complex query
-      };
-    } finally {
-      connection.release();
-    }
+    const habitRepo = AppDataSource.getRepository(BadHabit);
+    const occurrenceRepo = AppDataSource.getRepository(HabitOccurrence);
+
+    const habits = await habitRepo.find({ where: { user: { id: userId.toString() } } });
+    const habitsImproved = habits.filter((habit) => (habit as any).improvementPercentage > 0);
+
+    const streak = 0; // لسه مش معروف منين بتجيب الستريك - لو في جدول خاص بيه عرفه هنا
+
+    return {
+      habitsTracked: habits.length,
+      habitsImproved: habitsImproved.length,
+      currentStreak: streak,
+      weeklyProgress: 75, // هنحسبه في الدالة اللي بعدها
+    };
   }
 
   static async getWeeklyProgress(userId: number): Promise<WeeklyProgress> {
-const connection = AppDataSource.manager;
-    try {
-      // Get the start of the current week (Sunday)
-      const weekStart = new Date();
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      weekStart.setHours(0, 0, 0, 0);
-      
-      // Query for occurrences per day this week
-      const [occurrences] = await connection.query(
-        `SELECT DAYOFWEEK(occurrence_date) as day, COUNT(*) as count 
-         FROM habit_occurrences 
-         WHERE user_id = ? AND occurrence_date >= ?
-         GROUP BY DAYOFWEEK(occurrence_date)`,
-        [userId, weekStart]
-      );
-      
-      // Initialize array with 0 counts for each day (1=Sunday to 7=Saturday)
-      const dailyCounts = [0, 0, 0, 0, 0, 0, 0];
-      occurrences.forEach((row: any) => {
-        dailyCounts[row.day - 1] = row.count;
-      });
-      
-      return {
-        weekStart,
-        habitsTracked: [1, 2, 3, 4, 5, 6, 7], // This would come from actual data
-        occurrences: dailyCounts
-      };
-    } finally {
-      connection.release();
-    }
+    const occurrenceRepo = AppDataSource.getRepository(HabitOccurrence);
+
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+
+    const occurrences = await occurrenceRepo
+      .createQueryBuilder('occurrence')
+      .select('DAYOFWEEK(occurrence.occurrenceDate)', 'day')
+      .addSelect('COUNT(*)', 'count')
+      .where('occurrence.user = :userId', { userId })
+      .andWhere('occurrence.occurrenceDate >= :weekStart', { weekStart })
+      .groupBy('day')
+      .getRawMany();
+
+    const dailyCounts = [0, 0, 0, 0, 0, 0, 0];
+    occurrences.forEach((row: any) => {
+      dailyCounts[row.day - 1] = parseInt(row.count);
+    });
+
+    return {
+      weekStart,
+      habitsTracked: [], // لو محتاج تجيبهم كبيانات ممكن تضيفها
+      occurrences: dailyCounts,
+    };
   }
 
   static async getMonthlyReports(userId: number): Promise<MonthlyReport> {
-const connection = AppDataSource.manager;
-    try {
-      const currentDate = new Date();
-      const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
-      
-      const [totalOccurrences] = await connection.query(
-        `SELECT COUNT(*) as count FROM habit_occurrences 
-         WHERE user_id = ? AND MONTH(occurrence_date) = ? AND YEAR(occurrence_date) = ?`,
-        [userId, month, year]
-      );
-      
-      const [improvement] = await connection.query(
-        `SELECT AVG(improvement_percentage) as avg_improvement 
-         FROM user_habits WHERE user_id = ?`,
-        [userId]
-      );
-      
-      return {
-        month,
-        year,
-        totalOccurrences: totalOccurrences[0].count,
-        improvementPercentage: improvement[0].avg_improvement || 0
-      };
-    } finally {
-      connection.release();
-    }
+    const occurrenceRepo = AppDataSource.getRepository(HabitOccurrence);
+    const habitRepo = AppDataSource.getRepository(BadHabit);
+
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    const occurrences = await occurrenceRepo
+      .createQueryBuilder('occurrence')
+      .where('occurrence.user = :userId', { userId })
+      .andWhere('MONTH(occurrence.occurrenceDate) = :month', { month })
+      .andWhere('YEAR(occurrence.occurrenceDate) = :year', { year })
+      .getCount();
+
+    const habits = await habitRepo.find({ where: { user: { id: userId.toString() } } });
+    const totalImprovement = habits.reduce((sum, h) => sum + ((h as any).improvementPercentage || 0), 0);
+    const avgImprovement = habits.length ? totalImprovement / habits.length : 0;
+
+    return {
+      month,
+      year,
+      totalOccurrences: occurrences,
+      improvementPercentage: avgImprovement,
+    };
   }
 }
 

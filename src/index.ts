@@ -5,6 +5,7 @@ import { publicRouter, protectedRouter } from './routes/index';
 import { AppDataSource } from './dbConfig/data-source';
 import { authenticate } from './middlewares/auth.middleware';
 import { globalErrorHandling } from './middlewares/error.middleware';
+// import { financialPlanRoutes } from '../src/routes/index';
 
 dotenv.config();
 
@@ -40,6 +41,8 @@ AppDataSource.initialize()
     // Public routes
     app.use('/api/auth', publicRouter);
 
+    // app.use("/api/financial-plan", financialPlanRoutes);
+    
     // Protected routes
     app.use('/api', (req, res, next) => {
       Promise.resolve(authenticate(req, res, next)).catch(next);

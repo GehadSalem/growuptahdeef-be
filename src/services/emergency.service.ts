@@ -1,3 +1,4 @@
+// ✅ emergency.service.ts
 import { EmergencyFund, EmergencyFundType } from '../entities/EmergencyFund.entity';
 import { EmergencyRepository } from '../repositories/emergency.repository';
 import { UserRepository } from '../repositories/user.repository';
@@ -31,18 +32,13 @@ export class EmergencyService {
       throw new Error('User not found');
     }
 
-    try {
-      return await this.emergencyRepository.createFund({
-        amount,
-        type: EmergencyFundType.DEPOSIT,
-        description,
-        date: new Date(),
-        user
-      });
-    } catch (error) {
-      console.error('Error adding to emergency fund:', error);
-      throw new Error('Failed to add to emergency fund');
-    }
+    return await this.emergencyRepository.createFund({
+      amount,
+      type: EmergencyFundType.DEPOSIT,
+      description,
+      date: new Date(),
+      user
+    });
   }
 
   async withdrawFromFund(
@@ -61,7 +57,7 @@ export class EmergencyService {
       type: EmergencyFundType.WITHDRAWAL,
       description: description || 'سحب من صندوق الطوارئ',
       date: new Date(),
-      user: { id: userId } as User
+      user: { id: userId } as User,
     });
 
     await this.fundRepository.save(withdrawal);
@@ -73,37 +69,21 @@ export class EmergencyService {
   }
 
   async getUserFunds(userId: string): Promise<EmergencyFund[]> {
-    try {
-      return await this.emergencyRepository.findUserFunds(userId);
-    } catch (error) {
-      console.error('Error fetching user funds:', error);
-      throw new Error('Failed to get user funds');
-    }
+    return await this.emergencyRepository.findUserFunds(userId);
   }
 
   async calculateSuggestedAmount(userId: string): Promise<number> {
     const user = await this.userRepository.findById(userId);
-    if (!user) {
-      throw new Error('المستخدم غير موجود');
-    }
-
+    if (!user) throw new Error('المستخدم غير موجود');
     if (!user.monthlyIncome || user.monthlyIncome <= 0) {
       throw new Error('دخل المستخدم الشهري غير صالح');
     }
-
     return Number((user.monthlyIncome * 0.7).toFixed(2));
   }
 
   async getTotalEmergencyFund(userId: string): Promise<number> {
-    try {
-      const funds = await this.getUserFunds(userId);
-      return funds.reduce((total: number, fund: EmergencyFund) => {
-        return total + fund.amount;
-      }, 0);
-    } catch (error) {
-      console.error('Error calculating total emergency fund:', error);
-      throw new Error('حدث خطأ أثناء حساب إجمالي صندوق الطوارئ');
-    }
+    const funds = await this.getUserFunds(userId);
+    return funds.reduce((total: number, fund: EmergencyFund) => total + fund.amount, 0);
   }
 
   async calculateCurrentBalance(userId: string): Promise<number> {
@@ -111,3 +91,4 @@ export class EmergencyService {
     return funds.reduce((total, tx) => total + Number(tx.amount), 0);
   }
 }
+

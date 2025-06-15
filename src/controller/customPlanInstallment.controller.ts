@@ -15,7 +15,7 @@ export class CustomInstallmentPlanController {
       const { name, totalAmount, downPayment, monthlyAmount, dueDate , interestRate, linkedGoalId } = req.body;
 
       // Basic validation
-      if (!name || !totalAmount || !monthlyAmount || !dueDate) {
+      if (!name || !totalAmount || !monthlyAmount) {
         res.status(400).json({ message: 'Missing required fields' });
         return;
       }

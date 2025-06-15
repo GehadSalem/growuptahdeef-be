@@ -27,7 +27,7 @@ export class UserService {
     }
 
     async updateUserStatus(id: string, isActive: boolean): Promise<void> {
-        await this.userRepository.update(id, { isActive });
+await this.userRepository.update(id, { isActive: false } as any);
     }
 
     async getUserById(id: string): Promise<User | null> {

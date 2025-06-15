@@ -13,6 +13,9 @@ import { Expense } from "../entities/Expense.entity";
 import { EmergencyFund } from "../entities/EmergencyFund.entity";
 import { CustomInstallmentPlan } from "../entities/CustomInstallmentPlan.entity";
 import { DailyTask } from "../entities/DailyTask.entity";
+import { FinancialPlan } from "../entities/FinancialPlan.entity";
+import { Referral } from "../entities/Referral.entity";
+import { BadHabit, HabitOccurrence } from "../entities/BadHabit.entity";
 
 // Entity imports
 
@@ -42,7 +45,11 @@ export const AppDataSource = new DataSource({
     Expense,
     EmergencyFund,
     CustomInstallmentPlan,
-    DailyTask
+    DailyTask,
+    FinancialPlan,
+    Referral,
+    BadHabit,
+    HabitOccurrence
   ],
   
   // Option 2: File path pattern (comment out the above and uncomment below if preferred)

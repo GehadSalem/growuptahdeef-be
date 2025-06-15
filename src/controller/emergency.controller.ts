@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import '../types/express';
 import { EmergencyService } from '../services/emergency.service';
+import { EmergencyFundType } from '../entities/EmergencyFund.entity';
 
 class EmergencyController {
     private static emergencyService = new EmergencyService();
@@ -39,19 +40,12 @@ class EmergencyController {
 
     const funds = await this.emergencyService.getUserFunds(request.user.id);
 
-    // حساب الرصيد الكلي
-    const totalAmount = funds.reduce((sum, tx) => {
-      // Replace 'transactionType' with the correct property, e.g., 'type'
-      return tx.type === "deposit"
-        ? sum + Number(tx.amount || 0)
-        : sum - Number(tx.amount || 0);
-    }, 0);
+    const totalAmount = funds.reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
 
-    // ✅ الآن يرجع البيانات بالشكل المطلوب
-    response.json({
-      transactions: funds,
-      totalAmount,
-    });
+response.json({
+  transactions: funds,
+  totalAmount,
+});
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
