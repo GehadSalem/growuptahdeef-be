@@ -109,10 +109,10 @@ badHabits: BadHabit[];
 @OneToMany(() => HabitOccurrence, (occurrence) => occurrence.user)
 habitOccurrences!: HabitOccurrence[];
 
-  @BeforeInsert()
-  generateReferralCode() {
-    if (!this.referralCode) {
-      this.referralCode = randomBytes(4).toString('hex');
-    }
-  }
+  // @BeforeInsert()
+  // generateReferralCode() {
+  //   if (!this.referralCode) {
+  //     this.referralCode = randomBytes(4).toString('hex');
+  //   }
+  // }
 }

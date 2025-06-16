@@ -130,7 +130,7 @@ protectedRouter.put('/custom-installment-plans/:id', asyncHandler(CustomInstallm
 protectedRouter.delete('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.deletePlan));
 
 // Referral system
-protectedRouter.get('/referrals', asyncHandler(getReferrals));
+// protectedRouter.get('/referrals', asyncHandler(getReferrals));
 
 /* ---------------------- Dashboard Stats ---------------------- */
 protectedRouter.get('/stats/dashboard', asyncHandler(DashboardStatsController.getDashboardStats));

@@ -17,8 +17,12 @@ export class CustomInstallmentPlanRepository {
   }
 
   async findByUser(user: User): Promise<CustomInstallmentPlan[]> {
-    return await this.repository.find({ where: { user } });
-  }
+  return await this.repository.find({
+    where: { user: { id: user.id } },
+    relations: ['linkedGoal'] // optional حسب احتياجك
+  });
+}
+
 
   async findById(id: string, user: User): Promise<CustomInstallmentPlan | null> {
     return await this.repository.findOne({ where: { id, user } });

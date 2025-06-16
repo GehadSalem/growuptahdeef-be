@@ -10,50 +10,72 @@ export class CustomInstallmentPlanController {
   private static service = new CustomInstallmentPlanService();
   private static userService = new UserService();
 
-  static addPlan = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { name, totalAmount, downPayment, monthlyAmount, dueDate , interestRate, linkedGoalId } = req.body;
+ static addPlan = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, totalAmount, downPayment, monthlyAmount, dueDate, interestRate, linkedGoalId } = req.body;
 
-      // Basic validation
-      if (!name || !totalAmount || !monthlyAmount) {
-        res.status(400).json({ message: 'Missing required fields' });
+    const user = (req as any).user;
+    if (!user) {
+      res.status(401).json({ message: 'Unauthorized: No user found in request' });
+      return;
+    }
+
+    if (!name || !totalAmount ) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+
+const plan = new CustomInstallmentPlan();
+
+plan.name = name;
+plan.totalAmount = totalAmount;
+plan.downPayment = downPayment || 0;
+plan.interestRate = interestRate || 0;
+plan.dueDate = dueDate;
+plan.startDate = new Date();
+plan.status = 'active';
+plan.notes = null;
+plan.user = user;
+
+// 🔥 حساب المدة بالأشهر
+const months = plan.dueDate
+  ? this.calculateMonthsBetweenDates(plan.startDate, new Date(plan.dueDate))
+  : 1;
+
+// 🔥 حساب المبلغ الشهري
+const principal = totalAmount - plan.downPayment;
+plan.monthlyAmount = this.calculateMonthlyPayment(principal, plan.interestRate, months);
+plan.monthlyInstallment = plan.monthlyAmount;
+
+    if (linkedGoalId) {
+      const goal = await AppDataSource.getRepository(MajorGoal).findOneBy({ id: linkedGoalId });
+      if (!goal) {
+        res.status(404).json({ message: 'Linked goal not found' });
         return;
       }
-
-      // Create new plan
-      const plan = new CustomInstallmentPlan();
-      plan.name = name;
-      plan.totalAmount = totalAmount;
-      plan.downPayment = downPayment || 0;
-      plan.monthlyAmount = monthlyAmount;
-      plan.interestRate = interestRate || 0;
-      
-      // Calculate monthly installment
-      plan.monthlyInstallment = this.calculateMonthlyPayment(
-        totalAmount - (downPayment || 0),
-        interestRate || 0,
-        monthlyAmount
-      );
-
-      // Link to goal if provided
-      if (linkedGoalId) {
-        const goal = await AppDataSource.getRepository(MajorGoal).findOneBy({ id: linkedGoalId });
-        if (!goal) {
-          res.status(404).json({ message: 'Linked goal not found' });
-          return;
-        }
-        plan.linkedGoal = goal;
-      }
-
-      // Save to database
-      const savedPlan = await AppDataSource.getRepository(CustomInstallmentPlan).save(plan);
-      
-      res.status(201).json(savedPlan);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      res.status(500).json({ message: errorMessage });
+      plan.linkedGoal = goal;
     }
-  };
+
+    const savedPlan = await AppDataSource.getRepository(CustomInstallmentPlan).save(plan);
+
+    res.status(201).json(savedPlan);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    res.status(500).json({ message: errorMessage });
+  }
+};
+
+
+
+
+  private static calculateMonthsBetweenDates(start: Date, end: Date): number {
+  const startYear = start.getFullYear();
+  const startMonth = start.getMonth();
+  const endYear = end.getFullYear();
+  const endMonth = end.getMonth();
+
+  return (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+}
 
   private static calculateMonthlyPayment(
     principal: number,

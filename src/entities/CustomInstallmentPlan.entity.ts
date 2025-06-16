@@ -21,6 +21,11 @@ user!: User;
 
   @Column('int')
   monthlyAmount!: number;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+type?: string;
+
+@Column({ type: 'varchar', length: 50, nullable: true })
+recurrence?: string;
 
   @Column('decimal', { precision: 12, scale: 2 })
   monthlyInstallment!: number;
