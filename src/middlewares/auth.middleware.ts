@@ -11,9 +11,9 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     }
     try {
         const { authorization } = req.headers;
-        console.log('Authentication started');
-        console.log('Received headers:', req.headers);
-        console.log('Auth header:', { authorization });
+        console.log(' Authentication started');
+        console.log(' Received headers:', req.headers);
+        console.log(' Auth header:', { authorization });
 
         if (!authorization) {
             return res.status(400).json({ 
@@ -35,7 +35,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
             });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as unknown as { id: string, iat: string };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yoursecretkey') as unknown as { id: string, iat: string };
         
         if (!decoded?.id) {
             return res.status(400).json({ 

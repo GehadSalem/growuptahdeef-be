@@ -71,7 +71,7 @@ export class AuthService {
     }
 
     private generateJWT(userId: string): string {
-        return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'secret', {
+        return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'yoursecretkey', {
             expiresIn: '7d'
         });
     }
