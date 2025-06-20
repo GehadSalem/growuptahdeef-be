@@ -81,7 +81,7 @@ class HabitController {
             }
 
             const habitId = request.params.id;
-            const { title, category, frequency } = request.body;
+            const { name, category, frequency } = request.body;
 
             if (!habitId) {
                 response.status(400).json({ message: 'Invalid habit ID' });
@@ -92,7 +92,7 @@ class HabitController {
                 habitId,
                 request.user.id,
                 { 
-                    title,
+                    name,
                     category,
                     frequency: frequency && {
                         type: frequency.type,
