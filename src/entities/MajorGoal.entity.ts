@@ -16,10 +16,10 @@ export class MajorGoal {
   @Column('text')
   description!: string;
 
-  @Column({ type: 'enum', enum: ['financial', 'personal', 'health', 'education'] })
+  @Column()
   category!: string;
 
-  @Column('decimal', { precision: 12, scale: 2 })
+  @Column({nullable: true})
   estimatedCost!: number;
 
   @Column({ type: 'date' })
