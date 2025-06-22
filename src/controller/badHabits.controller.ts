@@ -13,7 +13,7 @@ export class BadHabitsController {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const habits = await badHabitService.findAllByUserId(+userId);
+      const habits = await badHabitService.findAllByUserId(userId);
       res.json({ success: true, data: habits });
     } catch (err) {
       res.status(500).json({ success: false, message: (err as Error).message });
@@ -27,7 +27,7 @@ export class BadHabitsController {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
       const { name, description } = req.body;
-      const newHabit = await badHabitService.create(+userId, { name, description });
+      const newHabit = await badHabitService.create(userId, { name, description });
       res.status(201).json({ success: true, data: newHabit });
     } catch (err) {
       res.status(500).json({ success: false, message: (err as Error).message });
@@ -71,7 +71,7 @@ export class BadHabitsController {
       if (!userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
-      const result = await badHabitService.recordOccurrence(id, +userId);
+      const result = await badHabitService.recordOccurrence(id, userId);
       res.json({ success: true, data: result });
     } catch (err) {
       res.status(500).json({ success: false, message: (err as Error).message });
