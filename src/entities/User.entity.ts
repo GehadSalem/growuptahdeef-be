@@ -64,6 +64,9 @@ export class User {
   @Column({ default: true })
   isActive!: boolean;
 
+  @Column({ default: 0 })
+  monthlyCommitment: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

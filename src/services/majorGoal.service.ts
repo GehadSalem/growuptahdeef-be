@@ -1,9 +1,11 @@
-import { error } from "console";
 import { AppDataSource } from "../dbConfig/data-source";
 import { MajorGoal } from "../entities/MajorGoal.entity";
 import { User } from "../entities/User.entity";
 
 export class MajorGoalService {
+  static getMajorGoalById(goalId: string) {
+    throw new Error('Method not implemented.');
+  }
   private majorGoalRepository = AppDataSource.getRepository(MajorGoal);
 
   async createMajorGoal(
@@ -15,10 +17,16 @@ export class MajorGoalService {
         ...goalData,
         user,
       });
-      return await this.majorGoalRepository.save(newGoal);
+
+      const savedGoal = await this.majorGoalRepository.save(newGoal);
+
+      // Recalculate user financial values
+      await this.recalculateUserFinancials(user.id);
+
+      return savedGoal;
     } catch (err) {
       console.log(err);
-      return err as any;
+      throw err;
     }
   }
 
@@ -58,12 +66,40 @@ export class MajorGoalService {
     return await this.majorGoalRepository.save(goal);
   }
 
-  static async getMajorGoalById(id: string): Promise<MajorGoal | null> {
-    return MajorGoal.findOne({
+  async recalculateUserFinancials(userId: string): Promise<void> {
+    const goals = await this.getUserMajorGoals(userId);
+    const now = new Date();
+
+    let totalMonthlyRequired = 0;
+
+    goals.forEach(goal => {
+      if (!goal.targetDate) return;
+
+      const endDate = new Date(goal.targetDate);
+      const monthsRemaining = Math.max(
+        1,
+        (endDate.getFullYear() - now.getFullYear()) * 12 +
+        (endDate.getMonth() - now.getMonth())
+      );
+
+      const amountRemaining = goal.estimatedCost - (goal.progress / 100 * goal.estimatedCost);
+      const monthlyForGoal = amountRemaining / monthsRemaining;
+      totalMonthlyRequired += monthlyForGoal;
+    });
+
+    // update
+    await AppDataSource
+      .getRepository(User)
+      .update(userId, { monthlyCommitment: totalMonthlyRequired });
+  }
+
+  async getMajorGoalById(id: string): Promise<MajorGoal | null> {
+    return await AppDataSource.getRepository(MajorGoal).findOne({
       where: { id },
       relations: ["user"],
     });
   }
+
   static async updateGoalProgress(goalId: string): Promise<void> {
     const goal = await MajorGoal.findOne({
       where: { id: goalId },
@@ -74,7 +110,6 @@ export class MajorGoalService {
 
     let totalPaid = 0;
 
-    // Sum all payments from all linked installment plans
     goal.linkedInstallments?.forEach((plan: { payments: any[] }) => {
       plan.payments?.forEach((payment) => {
         if (payment.status === "paid") {

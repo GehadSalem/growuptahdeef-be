@@ -13,12 +13,18 @@ class MajorGoalController {
         res.status(400).json({ message: 'User information is missing in the request.' });
         return;
       }
+
       const user = await this.userService.getUserById(req.user.id);
       if (!user) {
         res.status(404).json({ message: 'User not found.' });
         return;
       }
+
       const newGoal = await this.majorGoalService.createMajorGoal(user, req.body);
+
+      // Update user financial accounts after adding
+      await this.majorGoalService.recalculateUserFinancials(user.id);
+
       res.status(201).json(newGoal);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -70,36 +76,34 @@ class MajorGoalController {
       res.status(500).json({ message: errorMessage });
     }
   };
+
   static getMajorGoalById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const goalId = req.params.id;
+    try {
+      const goalId = req.params.id;
 
-    if (!req.user) {
-      res.status(400).json({ message: 'User information is missing in the request.' });
-      return;
+      if (!req.user) {
+        res.status(400).json({ message: 'User information is missing in the request.' });
+        return;
+      }
+
+      const goal = await this.majorGoalService.getMajorGoalById(goalId);
+
+      if (!goal) {
+        res.status(404).json({ message: 'Major goal not found.' });
+        return;
+      }
+
+      if (goal.user.id !== req.user.id) {
+        res.status(403).json({ message: 'Access denied to this goal.' });
+        return;
+      }
+
+      res.json(goal);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      res.status(500).json({ message: errorMessage });
     }
-
-    const goal = await this.MajorGoalService.getMajorGoalById(goalId);
-
-    if (!goal) {
-      res.status(404).json({ message: 'Major goal not found.' });
-      return;
-    }
-
-    // Optional: ensure the goal belongs to the current user
-    if (goal?.user.id !== req.user.id) {
-      res.status(403).json({ message: 'Access denied to this goal.' });
-      return;
-    }
-
-    res.json(goal);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ message: errorMessage });
-  }
-};
-  static MajorGoalService: any;
-
+  };
 }
 
 export default MajorGoalController;
