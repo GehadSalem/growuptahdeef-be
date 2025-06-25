@@ -8,7 +8,6 @@ export class BadHabitsController {
   static async getAllBadHabits(req: Request, res: Response) {
     try {
       const userId = req.user?.id;
-      console.log(userId);
       if (!userId ) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
@@ -26,8 +25,8 @@ export class BadHabitsController {
       if (!userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
-      const { name, description } = req.body;
-      const newHabit = await badHabitService.create(userId, { name, description });
+      const { name, description, severity } = req.body;
+      const newHabit = await badHabitService.create(userId, { name, description, severity });
       res.status(201).json({ success: true, data: newHabit });
     } catch (err) {
       res.status(500).json({ success: false, message: (err as Error).message });

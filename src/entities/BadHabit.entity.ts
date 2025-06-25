@@ -20,7 +20,7 @@ export class BadHabit {
   name!: string;
 
   @Column({ type: 'text', nullable: true })
-  description!: string | null;
+  description: string | null;
 
   @Column({ type: 'int', default: 3 })
   severity!: number;

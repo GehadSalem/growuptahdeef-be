@@ -43,8 +43,8 @@ static logout = (req: Request, res: Response): void => {
         res.status(400).json({ message: 'Invalid token format' });
         return;
     }
-
-    tokenBlacklist.add(token); 
+    //remove the token from headder
+    tokenBlacklist.add(token);
     res.status(200).json({ message: 'Logout successful' });
 };
 

@@ -19,8 +19,11 @@ export class MajorGoal {
   @Column()
   category!: string;
 
-  @Column({nullable: true})
+  @Column({nullable: false})
   estimatedCost!: number;
+
+  @Column()
+  currentAmount: number;
 
   @Column({ type: 'date' })
   targetDate!: Date;

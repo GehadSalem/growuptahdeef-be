@@ -43,8 +43,6 @@ class MajorGoalController {
   static updateMajorGoal = async (req: Request, res: Response): Promise<void> => {
     try {
       const updatedGoal = await this.majorGoalService.updateMajorGoal(req.params.id, req.body);
-      console.log(updatedGoal);
-      
       res.json(updatedGoal);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';

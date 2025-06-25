@@ -17,17 +17,15 @@ export class BadHabitService {
 
   async create(
     userId: string,
-    data: { name: string; description?: string }
+    data: { name: string; description?: string; severity?: number }
   ): Promise<BadHabit> {
-    console.log(userId);
     const habit = this.habitRepo.create({
       name: data.name,
       description: data.description || null,
+      severity: data.severity, // Default severity
       user: { id: userId.toString() },
     });
-    console.log(habit);
     const savedHabit = await this.habitRepo.save(habit);
-    console.log(savedHabit);
     return savedHabit;
   }
 
@@ -66,7 +64,6 @@ export class BadHabitService {
       habit: { id: habitId.toString() },
       user: { id: userId.toString() },
     });
-    console.log(occurrence);
     await this.occurrenceRepo.save(occurrence);
 
     return await this.habitRepo.findOne({

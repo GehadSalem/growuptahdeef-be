@@ -15,11 +15,10 @@ export class MajorGoalService {
         ...goalData,
         user,
       });
-      const data = await this.majorGoalRepository.save(newGoal);   
-      return data;
+      return await this.majorGoalRepository.save(newGoal);
     } catch (err) {
       console.log(err);
-      return err as any
+      return err as any;
     }
   }
 
