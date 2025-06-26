@@ -25,8 +25,8 @@ export class BadHabitsController {
       if (!userId) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
-      const { name, description, severity } = req.body;
-      const newHabit = await badHabitService.create(userId, { name, description, severity });
+      const { name, alternativeAction, dayCount } = req.body;
+      const newHabit = await badHabitService.create(userId, { name, alternativeAction, dayCount });
       res.status(201).json({ success: true, data: newHabit });
     } catch (err) {
       res.status(500).json({ success: false, message: (err as Error).message });

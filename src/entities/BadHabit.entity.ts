@@ -20,10 +20,16 @@ export class BadHabit {
   name!: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  goal: string ;
 
   @Column({ type: 'int', default: 3 })
-  severity!: number;
+  dayCount!: number;
+
+  @Column()
+  alternativeAction!: string;
+
+  @Column({nullable: true})
+  description?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

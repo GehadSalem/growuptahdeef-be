@@ -17,12 +17,12 @@ export class BadHabitService {
 
   async create(
     userId: string,
-    data: { name: string; description?: string; severity?: number }
+    data: { name: string; alternativeAction: string; dayCount?: number }
   ): Promise<BadHabit> {
     const habit = this.habitRepo.create({
       name: data.name,
-      description: data.description || null,
-      severity: data.severity, // Default severity
+      alternativeAction: data.alternativeAction || " ",
+      dayCount: data.dayCount, // Default severity
       user: { id: userId.toString() },
     });
     const savedHabit = await this.habitRepo.save(habit);
