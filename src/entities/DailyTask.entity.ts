@@ -16,10 +16,10 @@ export enum HabitType {
   OTHER = 'OTHER'
 }
 
-export enum TaskStatus {
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  SKIPPED = 'SKIPPED'
+export enum TaskPriority {
+  HIGH = 'high',
+  LOW = 'low',
+  MEDIUM = 'medium'
 }
 
 @Entity()
@@ -33,50 +33,21 @@ export class DailyTask {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @ManyToOne(() => User, user => user.dailyTasks)
-  user!: User;
-
-  @Column({
-    type: 'enum',
-    enum: HabitType,
-    default: HabitType.OTHER
-  })
-  habitType!: HabitType;
-
-  @Column({ default: false })
-  isRecurring!: boolean;
-
-  @Column('json', { nullable: true })
-  frequency?: {
-    interval: 'daily' | 'weekly' | 'monthly';
-    daysOfWeek?: number[]; 
-    dayOfMonth?: number;  
-  };
-
-  @Column({ type: 'time' })
-  reminderTime!: string; 
-
-  @Column({
-    type: 'enum',
-    enum: TaskStatus,
-    default: TaskStatus.PENDING
-  })
-  status!: TaskStatus;
-
-  @Column({ default: false }) 
+ @Column({ default: false }) 
   isCompleted!: boolean;
 
-  @Column({ default: 0 })
-  streak!: number;
+  @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.MEDIUM })
+  priority!: TaskPriority;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   dueDate!: Date;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  currentAmount?: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  targetAmount?: number;
+  @Column({nullable: true})
+  categoty: string
+
+  @ManyToOne(() => User, user => user.dailyTasks)
+  user!: User;
 
   @CreateDateColumn()
   createdAt!: Date;

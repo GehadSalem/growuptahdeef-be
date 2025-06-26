@@ -11,7 +11,10 @@ export class DailyTaskRepository {
 
     async create(dailyTaskData: Partial<DailyTask>): Promise<DailyTask> {
         const dailyTask = this.repository.create(dailyTaskData);
-        return this.repository.save(dailyTask);
+        const data =  this.repository.save(dailyTask);
+        console.log(data);
+        
+        return data;
     }
 
     async findByUserId(userId: string): Promise<DailyTask[]> {
@@ -38,11 +41,14 @@ export class DailyTaskRepository {
     }
 
     async markAsComplete(id: string): Promise<DailyTask | null> {
+        console.log(`Marking daily task ${id} as complete`);
+        
         const dailyTask = await this.repository.findOneBy({ id });
+        console.log(dailyTask);
+        
         if (!dailyTask) return null;
         
         dailyTask.isCompleted = true;
-        dailyTask.streak += 1;
         return this.repository.save(dailyTask);
     }
 
