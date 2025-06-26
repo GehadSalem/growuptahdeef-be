@@ -52,7 +52,7 @@ export class User {
   @Column({ default: 'email' })
   authProvider!: 'email' | 'google';
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   referralCode!: string;
 
   @Column({ nullable: true })
@@ -60,11 +60,12 @@ export class User {
 
   @Column({ default: false })
   subscribed!: boolean;
+  
 
   @Column({ default: true })
   isActive!: boolean;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, nullable: true })
   monthlyCommitment: number;
 
   @CreateDateColumn()
