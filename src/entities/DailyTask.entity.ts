@@ -33,7 +33,7 @@ export class DailyTask {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
- @Column({ default: false }) 
+  @Column({ default: false })
   isCompleted!: boolean;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.MEDIUM })
@@ -42,9 +42,21 @@ export class DailyTask {
   @Column({ type: 'date', nullable: true })
   dueDate!: Date;
 
+  @Column({ nullable: true })
+  categoty: string;
 
-  @Column({nullable: true})
-  categoty: string
+  @Column({ default: false })
+  isRecurring!: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  frequency?: {
+    interval: 'daily' | 'weekly' | 'monthly';
+    daysOfWeek?: number[];
+    dayOfMonth?: number;
+  };
+
+  @Column({ type: 'time', nullable: true })
+  reminderTime?: string;
 
   @ManyToOne(() => User, user => user.dailyTasks)
   user!: User;

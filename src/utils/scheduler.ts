@@ -9,6 +9,9 @@ export const createDailyTaskScheduler = (tasks: DailyTask[], notifyCallback: (ta
   // جدولة كل مهمة بناءً على وقت التذكير
   tasks.forEach(task => {
     const now = new Date();
+    if (!task.reminderTime) {
+      return;
+    }
     const reminderTime = new Date(task.reminderTime);
     
     if (reminderTime > now) {

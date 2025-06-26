@@ -1,5 +1,3 @@
-
-
 import { DailyTaskRepository } from '../repositories/dailyTask.repository';
 import { DailyTask } from '../entities/DailyTask.entity';
 
@@ -30,8 +28,7 @@ export class DailyTaskService {
   }
 
   async delete(id: string): Promise<boolean> {
-    await this.dailyTaskRepo.delete(id);
-    return true;
+    return await this.dailyTaskRepo.delete(id);
   }
 
   async markAsComplete(id: string) {

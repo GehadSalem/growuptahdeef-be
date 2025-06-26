@@ -14,11 +14,7 @@ class DailyTaskController {
       const task = await this.taskService.create(req.user.id, req.body);
       res.status(201).json(task);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(400).json({ message: 'An unknown error occurred' });
-      }
+      res.status(400).json({ message: (error as Error).message });
     }
   };
 
@@ -31,27 +27,22 @@ class DailyTaskController {
       const tasks = await this.taskService.getAll(req.user.id);
       res.json(tasks);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'An unknown error occurred' });
-      }
+      res.status(500).json({ message: (error as Error).message });
     }
   };
 
   static getTaskById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const task = await DailyTaskController.taskService.getById(req.params?.id);
-        if (!task) {   // <-- Error points here if getById returns void
-            res.status(404).json({ message: 'Task not found' });
-            return;
-        }
-        res.json(task);
+      const task = await this.taskService.getById(req.params.id);
+      if (!task) {
+        res.status(404).json({ message: 'Task not found' });
+        return;
+      }
+      res.json(task);
     } catch (error) {
-        res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: (error as Error).message });
     }
-};
-
+  };
 
   static updateTask = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -62,11 +53,7 @@ class DailyTaskController {
       }
       res.json(updated);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(400).json({ message: 'An unknown error occurred' });
-      }
+      res.status(400).json({ message: (error as Error).message });
     }
   };
 
@@ -79,11 +66,7 @@ class DailyTaskController {
       }
       res.status(204).send();
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ message: error.message });
-      } else {
-        res.status(500).json({ message: 'An unknown error occurred' });
-      }
+      res.status(500).json({ message: (error as Error).message });
     }
   };
 
@@ -92,11 +75,7 @@ class DailyTaskController {
       const task = await this.taskService.markAsComplete(req.params.id);
       res.json(task);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(400).json({ message: 'An unknown error occurred' });
-      }
+      res.status(400).json({ message: (error as Error).message });
     }
   };
 }
