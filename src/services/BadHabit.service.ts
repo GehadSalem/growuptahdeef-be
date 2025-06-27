@@ -52,23 +52,30 @@ export class BadHabitService {
   }
 
   async recordOccurrence(
-    habitId: number,
-    userId: string
-  ): Promise<BadHabit | null> {
-    const habit = await this.habitRepo.findOne({
-      where: { id: habitId.toString(), user: { id: userId.toString() } },
-    });
-    if (!habit) return null;
+  habitId: number,
+  userId: string
+): Promise<BadHabit | null> {
+  const habit = await this.habitRepo.findOne({
+    where: { id: habitId.toString(), user: { id: userId.toString() } },
+  });
+  if (!habit) return null;
 
-    const occurrence = this.occurrenceRepo.create({
-      habit: { id: habitId.toString() },
-      user: { id: userId.toString() },
-    });
-    await this.occurrenceRepo.save(occurrence);
+  // زود اليوم
+  habit.dayCount = (habit.dayCount || 0) + 1;
+  habit.updatedAt = new Date();
+  await this.habitRepo.save(habit);
 
-    return await this.habitRepo.findOne({
-      where: { id: habitId.toString() },
-      relations: ["occurrences"],
-    });
-  }
+  // سجل الoccurrence
+  const occurrence = this.occurrenceRepo.create({
+    habit: { id: habitId.toString() },
+    user: { id: userId.toString() },
+  });
+  await this.occurrenceRepo.save(occurrence);
+
+  // رجع أحدث نسخة
+  return await this.habitRepo.findOne({
+    where: { id: habitId.toString() },
+    relations: ["occurrences"],
+  });
+}
 }
