@@ -93,7 +93,7 @@ export class NotificationService {
   }
 
   // إرسال تذكير لعادات مثلاً
-  async sendReminder(user: User, habitName: string) {
+   async sendReminder(user: User, habitName: string) {
     await this.sendNotification(user, 'تذكير', `لا تنسَ تنفيذ عادة "${habitName}" اليوم!`);
   }
 }
