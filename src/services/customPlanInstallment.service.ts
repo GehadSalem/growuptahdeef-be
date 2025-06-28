@@ -66,7 +66,11 @@ export class CustomInstallmentPlanService {
       updatedPlan.monthlyInstallment = newTotalAmount / newMonthlyAmount;
     }
 
-    return await this.repository.update(id, updatedPlan, user);
+return await this.repository.update(
+  id,
+  updateData,
+  user
+);
   }
 
   async deletePlan(id: string, user: User): Promise<boolean> {

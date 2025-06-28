@@ -25,8 +25,14 @@ export class CustomInstallmentPlanRepository {
 
 
   async findById(id: string, user: User): Promise<CustomInstallmentPlan | null> {
-    return await this.repository.findOne({ where: { id, user } });
-  }
+  return await this.repository.findOne({
+    where: {
+      id,
+      user: { id: user.id }
+    }
+  });
+}
+
 
   async update(
     id: string,
