@@ -126,7 +126,7 @@ protectedRouter.delete('/installments/:id', asyncHandler(InstallmentController.d
 protectedRouter.post('/custom-installment-plans', asyncHandler(CustomInstallmentPlanController.addPlan));
 protectedRouter.get('/custom-installment-plans', asyncHandler(CustomInstallmentPlanController.getPlans));
 protectedRouter.get('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.getPlanById));
-protectedRouter.put('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.updatePlan));
+protectedRouter.patch('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.updatePlan));
 protectedRouter.delete('/custom-installment-plans/:id', asyncHandler(CustomInstallmentPlanController.deletePlan));
 
 // Referral system

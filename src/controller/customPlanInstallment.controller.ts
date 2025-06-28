@@ -10,9 +10,9 @@ export class CustomInstallmentPlanController {
   private static service = new CustomInstallmentPlanService();
   private static userService = new UserService();
 
- static addPlan = async (req: Request, res: Response): Promise<void> => {
+static addPlan = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, totalAmount, downPayment, monthlyAmount, dueDate, interestRate, linkedGoalId } = req.body;
+    const { name, totalAmount, downPayment, dueDate, interestRate, linkedGoalId } = req.body;
 
     const user = (req as any).user;
     if (!user) {
@@ -20,32 +20,33 @@ export class CustomInstallmentPlanController {
       return;
     }
 
-    if (!name || !totalAmount ) {
+    if (!name || !totalAmount) {
       res.status(400).json({ message: 'Missing required fields' });
       return;
     }
 
-const plan = new CustomInstallmentPlan();
+    const plan = new CustomInstallmentPlan();
+    plan.name = name;
+    plan.totalAmount = totalAmount;
+    plan.downPayment = downPayment || 0;
+    plan.interestRate = interestRate || 0;
+    plan.dueDate = dueDate;
+    plan.startDate = new Date();
+    plan.status = 'active';
+    plan.notes = req.body.notes || null;
+    plan.type = req.body.type || null;
+    plan.user = user;
 
-plan.name = name;
-plan.totalAmount = totalAmount;
-plan.downPayment = downPayment || 0;
-plan.interestRate = interestRate || 0;
-plan.dueDate = dueDate;
-plan.startDate = new Date();
-plan.status = 'active';
-plan.notes = null;
-plan.user = user;
+    const months = plan.dueDate
+      ? this.calculateMonthsBetweenDates(plan.startDate, new Date(plan.dueDate))
+      : 1;
 
-// 🔥 حساب المدة بالأشهر
-const months = plan.dueDate
-  ? this.calculateMonthsBetweenDates(plan.startDate, new Date(plan.dueDate))
-  : 1;
+    const principal = totalAmount - plan.downPayment;
+    plan.monthlyAmount = this.calculateMonthlyPayment(principal, plan.interestRate, months);
+    plan.monthlyInstallment = plan.monthlyAmount;
 
-// 🔥 حساب المبلغ الشهري
-const principal = totalAmount - plan.downPayment;
-plan.monthlyAmount = this.calculateMonthlyPayment(principal, plan.interestRate, months);
-plan.monthlyInstallment = plan.monthlyAmount;
+    // 🟢 تحديد التكرار
+    plan.recurrence = req.body.recurrence || this.determineRecurrence(months);
 
     if (linkedGoalId) {
       const goal = await AppDataSource.getRepository(MajorGoal).findOneBy({ id: linkedGoalId });
@@ -64,8 +65,6 @@ plan.monthlyInstallment = plan.monthlyAmount;
     res.status(500).json({ message: errorMessage });
   }
 };
-
-
 
 
   private static calculateMonthsBetweenDates(start: Date, end: Date): number {
@@ -89,7 +88,13 @@ plan.monthlyInstallment = plan.monthlyAmount;
            (Math.pow(1 + monthlyRate, months) - 1);
   }
 
-
+// وهنا هتضيف الدالة الجديدة
+  private static determineRecurrence(months: number): string {
+    if (months <= 1) return "مرة واحدة";
+    if (months <= 3) return "شهري";
+    if (months <= 12) return "ربع سنوي";
+    return "سنوي";
+  }
   static getPlans = async (req: Request, res: Response): Promise<void> => {
     try {
       if (!req.user) {
