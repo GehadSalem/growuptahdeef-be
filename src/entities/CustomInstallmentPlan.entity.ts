@@ -27,8 +27,9 @@ export class CustomInstallmentPlan {
   @Column("decimal", { precision: 12, scale: 2, default: 0, nullable: true })
   downPayment!: number;
 
-  @Column("int")
+  @Column("int", { nullable: true })
   monthlyAmount!: number;
+  
   @Column({ type: "varchar", length: 50, nullable: true })
   type?: string;
 
