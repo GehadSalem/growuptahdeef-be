@@ -36,7 +36,7 @@ export class InstallmentController {
       payment.paymentDate = new Date(paymentDate);
       payment.status = status || 'pending';
       payment.paymentMethod = paymentMethod || 'bank_transfer';
-      payment.installmentPlan = plan;
+      payment.installmentPlanId = plan;
 
       // Save payment
       const savedPayment = await AppDataSource.getRepository(InstallmentPayment).save(payment);
@@ -67,8 +67,8 @@ export class InstallmentController {
       }
 
       // Update goal progress if this installment is part of a plan linked to a goal
-      if (installment.installmentPlan?.linkedGoal) {
-        await MajorGoalService.updateGoalProgress(installment.installmentPlan.linkedGoal.id);
+      if (installment.installmentPlanId?.linkedGoal) {
+        await MajorGoalService.updateGoalProgress(installment.installmentPlanId.linkedGoal.id);
       }
 
       res.json(installment);

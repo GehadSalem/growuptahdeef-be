@@ -18,9 +18,9 @@ export class InstallmentRepository {
   async findByUser(user: User): Promise<InstallmentPayment[]> {
     return this.repository.find({ 
       where: { 
-        installmentPlan: { user: { id: user.id } } // Query through installmentPlan->user
+        installmentPlanId: { user: { id: user.id } } 
       },
-      relations: ['installmentPlan'] // Include the plan in the result
+      relations: ['installmentPlanId'] 
     });
   }
 
@@ -28,9 +28,9 @@ export class InstallmentRepository {
     return this.repository.findOne({ 
       where: { 
         id, 
-        installmentPlan: { user: { id: user.id } } // Query through installmentPlan->user
+        installmentPlanId: { user: { id: user.id } }
       },
-      relations: ['installmentPlan'] // Include the plan in the result
+      relations: ['installmentPlanId'] 
     });
   }
 
@@ -39,7 +39,6 @@ export class InstallmentRepository {
     updateData: Partial<InstallmentPayment>, 
     user: User
   ): Promise<InstallmentPayment | null> {
-    // First verify the installment belongs to the user
     const existing = await this.findById(id, user);
     if (!existing) return null;
 
@@ -51,7 +50,6 @@ export class InstallmentRepository {
   }
 
   async delete(id: string, user: User): Promise<boolean> {
-    // First verify the installment belongs to the user
     const existing = await this.findById(id, user);
     if (!existing) return false;
 
@@ -62,25 +60,24 @@ export class InstallmentRepository {
   async findByDateRange(user: User, startDate: Date, endDate: Date): Promise<InstallmentPayment[]> {
     return this.repository.find({
       where: {
-        installmentPlan: { user: { id: user.id } }, // Query through installmentPlan->user
+        installmentPlanId: { user: { id: user.id } },
         paymentDate: Between(startDate, endDate)
       },
-      relations: ['installmentPlan'] // Include the plan in the result
+      relations: ['installmentPlanId'] 
     });
   }
 
   async findByStatus(user: User, status: string): Promise<InstallmentPayment[]> {
     return this.repository.find({ 
       where: { 
-        installmentPlan: { user: { id: user.id } }, // Query through installmentPlan->user
+        installmentPlanId: { user: { id: user.id } },
         status 
       },
-      relations: ['installmentPlan'] // Include the plan in the result
+      relations: ['installmentPlanId'] 
     });
   }
 
   async markAsPaid(id: string, user: User): Promise<InstallmentPayment | null> {
-    // First verify the installment belongs to the user
     const existing = await this.findById(id, user);
     if (!existing) return null;
 
