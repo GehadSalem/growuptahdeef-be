@@ -29,7 +29,7 @@ export class CustomInstallmentPlan {
 
   @Column("int", { nullable: true })
   monthlyAmount!: number;
-  
+
   @Column({ type: "varchar", length: 50, nullable: true })
   type?: string;
 
@@ -62,7 +62,7 @@ export class CustomInstallmentPlan {
   })
   linkedGoal?: MajorGoal;
 
-  @OneToMany(() => InstallmentPayment, (payment) => payment.installmentPlan)
+  @OneToMany(() => InstallmentPayment, (payment) => payment.installmentPlanId)
   payments!: InstallmentPayment[];
 
   @Column({ type: "text", nullable: true })

@@ -6,7 +6,7 @@ export class InstallmentPayment {
   id!: string;
 
   @ManyToOne(() => CustomInstallmentPlan, plan => plan.payments)
-  installmentPlan!: CustomInstallmentPlan;
+  installmentPlanId!: CustomInstallmentPlan;
 
   @Column('decimal', { precision: 12, scale: 2, nullable: true })
   amount!: number;
